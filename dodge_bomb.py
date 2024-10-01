@@ -23,15 +23,13 @@ def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
     return yoko, tate
 
 def create_bomb() -> tuple[pg.Surface, pg.Rect, int, int]:
-    """
-    新しい爆弾のSurface, Rect, 速度vx, vyを生成して返す。
-    """
+    
     bb_img = pg.Surface((20, 20))
     pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)
     bb_img.set_colorkey((0, 0, 0))
     bb_rct = bb_img.get_rect()
     bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
-    vx, vy = random.choice([-10, 10]), random.choice([-10, 10])
+    vx, vy = random.choice([-15, 15]), random.choice([-15, 15])
     return bb_img, bb_rct, vx, vy
 
 
