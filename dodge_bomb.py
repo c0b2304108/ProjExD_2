@@ -1,15 +1,16 @@
 import os
 import random
 import sys
+import time
 import pygame as pg
 
 
 WIDTH, HEIGHT = 1100, 650
 DELTA = {
-    pg.K_UP:(0,-5),
-    pg.K_DOWN:(0,+5),
-    pg.K_LEFT:(-5,0),
-    pg.K_RIGHT:(+5,0),
+    pg.K_UP:(0,-30),
+    pg.K_DOWN:(0,+30),
+    pg.K_LEFT:(-30,0),
+    pg.K_RIGHT:(+30,0),
 }
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -20,6 +21,8 @@ def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
     if obj_rct.top < 0 or HEIGHT < obj_rct.bottom:
         tate = False
     return yoko, tate
+
+
 
 
 def main():
@@ -34,15 +37,36 @@ def main():
     bb_img.set_colorkey((0,0,0))
     bb_rct = bb_img.get_rect()
     bb_rct.center = random.randint(0,WIDTH), random.randint(0,HEIGHT)
-    vx, vy = +5, -5
+    vx, vy = +20, -20
     clock = pg.time.Clock()
+    font = pg.font.Font(None, 80)
     tmr = 0
+
+    overlay = pg.Surface((WIDTH, HEIGHT))
+    overlay.set_alpha(128)
+    overlay.fill((0, 0, 0))
+    kk2_img = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 0.9)
+
+    
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
         screen.blit(bg_img, [0, 0])
         if kk_rct.colliderect(bb_rct):
+            screen.blit(overlay, (0, 0))
+            game_over_text = font.render("Game Over", True, (255, 255, 255))
+            screen.blit(game_over_text, (WIDTH // 2 - 180, HEIGHT // 2 - 40))
+            
+            kk2_rct = kk2_img.get_rect()
+            kk2_rct.center = 350,300
+            screen.blit(kk2_img, kk2_rct)
+            kk2_rct = kk2_img.get_rect()
+            kk2_rct.center = 700,300
+            screen.blit(kk2_img, kk2_rct)
+
+            pg.display.update()
+            time.sleep(5)
             return
 
         key_lst = pg.key.get_pressed()
