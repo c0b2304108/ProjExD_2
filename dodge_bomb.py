@@ -69,7 +69,7 @@ def main():
             if event.type == pg.QUIT: 
                 return
         screen.blit(bg_img, [0, 0])
-        if tmr % 500 == 0:
+        if tmr % 50 == 0:
             bombs.append(create_bomb()) 
         
         for bb_img, bb_rct, vx, vy in bombs:
