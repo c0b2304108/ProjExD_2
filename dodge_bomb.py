@@ -22,6 +22,19 @@ def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
         tate = False
     return yoko, tate
 
+def create_bomb() -> tuple[pg.Surface, pg.Rect, int, int]:
+    """
+    新しい爆弾のSurface, Rect, 速度vx, vyを生成して返す。
+    """
+    bb_img = pg.Surface((20, 20))
+    pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)
+    bb_img.set_colorkey((0, 0, 0))
+    bb_rct = bb_img.get_rect()
+    bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
+    vx, vy = random.choice([-20, 20]), random.choice([-20, 20])
+    return bb_img, bb_rct, vx, vy
+
+
 
 
 
@@ -32,12 +45,15 @@ def main():
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
-    bb_img = pg.Surface((20,20))
-    pg.draw.circle(bb_img,(255,0,0), (10,10),10)
-    bb_img.set_colorkey((0,0,0))
-    bb_rct = bb_img.get_rect()
-    bb_rct.center = random.randint(0,WIDTH), random.randint(0,HEIGHT)
-    vx, vy = +20, -20
+    # bb_img = pg.Surface((20,20))
+    # pg.draw.circle(bb_img,(255,0,0), (10,10),10)
+    # bb_img.set_colorkey((0,0,0))
+    # bb_rct = bb_img.get_rect()
+    # bb_rct.center = random.randint(0,WIDTH), random.randint(0,HEIGHT)
+    # vx, vy = +20, -20
+
+    bombs = [create_bomb()]
+
     clock = pg.time.Clock()
     font = pg.font.Font(None, 80)
     tmr = 0
@@ -53,21 +69,25 @@ def main():
             if event.type == pg.QUIT: 
                 return
         screen.blit(bg_img, [0, 0])
-        if kk_rct.colliderect(bb_rct):
-            screen.blit(overlay, (0, 0))
-            game_over_text = font.render("Game Over", True, (255, 255, 255))
-            screen.blit(game_over_text, (WIDTH // 2 - 180, HEIGHT // 2 - 40))
-            
-            kk2_rct = kk2_img.get_rect()
-            kk2_rct.center = 350,300
-            screen.blit(kk2_img, kk2_rct)
-            kk2_rct = kk2_img.get_rect()
-            kk2_rct.center = 700,300
-            screen.blit(kk2_img, kk2_rct)
+        if tmr % 500 == 0:
+            bombs.append(create_bomb()) 
+        
+        for bb_img, bb_rct, vx, vy in bombs:
+            if kk_rct.colliderect(bb_rct):
+                screen.blit(overlay, (0, 0))
+                game_over_text = font.render("Game Over", True, (255, 255, 255))
+                screen.blit(game_over_text, (WIDTH // 2 - 180, HEIGHT // 2 - 40))
+                
+                kk2_rct = kk2_img.get_rect()
+                kk2_rct.center = 350,300
+                screen.blit(kk2_img, kk2_rct)
+                kk2_rct = kk2_img.get_rect()
+                kk2_rct.center = 700,300
+                screen.blit(kk2_img, kk2_rct)
 
-            pg.display.update()
-            time.sleep(5)
-            return
+                pg.display.update()
+                time.sleep(5)
+                return
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
@@ -87,13 +107,22 @@ def main():
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
         screen.blit(kk_img, kk_rct)
-        bb_rct.move_ip(vx,vy)
-        yoko, tate = check_bound(bb_rct)
-        if not yoko:
-            vx *= -1
-        if not tate:
-            vy *= -1
-        screen.blit(bb_img, bb_rct)
+
+        for i, (bb_img, bb_rct, vx, vy) in enumerate(bombs):
+            bb_rct.move_ip(vx,vy)
+            #yoko, tate = check_bound(bb_rct)
+            
+            # if not yoko:
+            #     vx *= -1
+            # if not tate:
+            #     vy *= -1
+
+            if bb_rct.left < 0 or bb_rct.right > WIDTH:
+                vx *= -1
+            if bb_rct.top < 0 or bb_rct.bottom > HEIGHT:
+                vy *= -1
+            bombs[i] = (bb_img, bb_rct, vx, vy)
+            screen.blit(bb_img, bb_rct)
 
         pg.display.update()
         tmr += 1
