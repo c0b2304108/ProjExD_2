@@ -31,7 +31,7 @@ def create_bomb() -> tuple[pg.Surface, pg.Rect, int, int]:
     bb_img.set_colorkey((0, 0, 0))
     bb_rct = bb_img.get_rect()
     bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
-    vx, vy = random.choice([-20, 20]), random.choice([-20, 20])
+    vx, vy = random.choice([-10, 10]), random.choice([-10, 10])
     return bb_img, bb_rct, vx, vy
 
 
